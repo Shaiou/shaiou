@@ -1,3 +1,4 @@
 .*
+Certs/*
 env.d/*
 source.d/local.source
