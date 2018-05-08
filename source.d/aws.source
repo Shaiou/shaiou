@@ -1,0 +1,89 @@
+function creds {
+    aws sts get-caller-identity
+}
+
+function clearaws {
+    unset AWS_PROFILE
+    unset AWS_DEFAULT_PROFILE
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    unset AWS_SESSION_TOKEN
+}
+
+function awset {
+    export PREV_AWS_PROFILE=$AWS_PROFILE
+    export AWS_DEFAULT_PROFILE=$1
+    export AWS_PROFILE=$1
+    eval "$(ssh-agent -s)"
+    export PS1="${YELLOW}[\$AWS_PROFILE/\$AWS_REGION]$RESET ${CYAN}\u@\h:..."'${PWD#"${PWD%/*/*}/"}'"$RED\$(__git_ps1 '(%s)')$RESET#"
+    find /Workspace/Keys -name  "$1.*.pem" -exec ssh-add {} + || return
+}
+
+#You need to have a line with mfa_$profile with the serial of your mfa device
+function mfa {
+    PROFILE=$1
+    TOKEN=$2
+    awset $PROFILE
+    MFA=$(awk '/mfa_'$PROFILE'/ {print $3}' ~/.aws/credentials)
+    TEMP=$(aws sts get-session-token --serial-number $MFA --token-code $TOKEN --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)
+
+    AWS_ACCESS_KEY_ID=$(echo $TEMP |awk '{print $1}')
+    AWS_SECRET_ACCESS_KEY=$(echo $TEMP |awk '{print $2}')
+    AWS_SESSION_TOKEN=$(echo $TEMP |awk '{print $3}')
+
+    aws configure set profile.${PROFILE}-mfa.aws_access_key_id $AWS_ACCESS_KEY_ID
+    aws configure set profile.${PROFILE}-mfa.aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    aws configure set profile.${PROFILE}-mfa.aws_session_token $AWS_SESSION_TOKEN
+
+    awset ${PROFILE}-mfa
+}
+
+function unassume {
+    awset $PREV_AWS_PROFILE
+}
+
+function assume {
+    PROFILE=$1
+    aws sts get-caller-identity --profile $PROFILE > /dev/null 2>&1 && echo "Creds are still valid" && awset $PROFILE && return
+    echo "Credentials expired, renewing token"
+    ACCOUNT=$(awk '$1=="'$1'" {print $2}' ~/.aws/assume.conf)
+    DEFAULTROLE=$(awk '$1=="'$1'" {print $3}' ~/.aws/assume.conf)
+    ROLE=$2
+    ROLE=${ROLE:-$DEFAULTROLE}
+    ARN=arn:aws:iam::${ACCOUNT}:role/$ROLE
+    TEMP=$(aws sts assume-role --role-arn $ARN --role-session-name $PROFILE --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text) || return
+
+    AWS_ACCESS_KEY_ID=$(echo $TEMP |awk '{print $1}')
+    AWS_SECRET_ACCESS_KEY=$(echo $TEMP |awk '{print $2}')
+    AWS_SESSION_TOKEN=$(echo $TEMP |awk '{print $3}')
+    export AWS_PROFILE_NAME="$PROFILE-$ROLE"
+
+    aws configure set profile.$PROFILE.aws_access_key_id $AWS_ACCESS_KEY_ID
+    aws configure set profile.$PROFILE.aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    aws configure set profile.$PROFILE.aws_session_token $AWS_SESSION_TOKEN
+
+    awset $PROFILE
+}
+
+function setregion {
+    export AWS_REGION=$1
+    export AWS_DEFAULT_REGION=$1
+}
+
+function ecrlogin {
+    if [ $# -eq 0 ]
+    then
+        $(aws ecr  get-login --no-include-email)
+    else
+        $(aws ecr  get-login --no-include-email --registry-ids $1)
+    fi
+}
+
+function stree {
+    region=$(aws s3api get-bucket-location --bucket $1 --output text --query 'LocationConstraint')
+    echo "===== $1 ( $region ) ======"
+    aws s3 ls --recursive s3://$1/ --region $region
+}
+
+## Default
+setregion eu-west-1

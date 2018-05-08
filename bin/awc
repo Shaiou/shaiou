@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+
+import boto3
+import os
+import re
+import simplejson as json
+import sys
+import time
+from tabulate import tabulate
+
+def print_table(rows, headers=""):
+    os.system("clear")
+    date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
+    print date
+    print tabulate(rows, headers)
+
+def ec2list(filter=".*",interval=0):
+    """ List EC2 instances in a table format"""
+    interval = int(interval)
+    def printlist():
+        client = boto3.client("ec2")
+        data = client.describe_instances()
+        list_instances = []
+        list_table = []
+        for reservation in data["Reservations"]:
+            list_instances.extend(reservation["Instances"])
+        for instance in list_instances:
+            list_instance = []
+            if "Tags" in instance:
+                for tag in instance["Tags"]:
+                    if tag["Key"] == "Name": 
+                        list_instance = [ tag["Value"] ]
+                        break
+            if not list_instance:
+                list_instance = [""]
+            list_instance.append(instance["InstanceId"])	
+            list_instance.append(instance["ImageId"])	
+            list_instance.append(instance["State"]["Name"])	
+            list_instance.append(instance["InstanceType"])	
+            try:
+                list_instance.append(instance["PrivateIpAddress"])	
+            except:
+                list_instance.append("")
+            try:
+                list_instance.append(instance["NetworkInterfaces"][0]["Association"]["PublicIp"])
+            except:
+                list_instance.append("")
+            if re.match("^.*"+filter+".*$", " ".join(list_instance)):
+                list_table.append(list_instance)
+        print_table(list_table, [ "Name", "ID", "Image", "State", "Type", "Private IP", "Public IP"])
+    if interval:
+        while True:
+            printlist()
+            time.sleep(interval)
+    else:
+        printlist()
+
+def ec2console(instanceid, interface="public"):
+    """ Query console output of new instance and ssh when ready"""
+    # First we get instance info
+    os.system("clear")
+    date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
+    client = boto3.client("ec2")
+    ready = False
+    old = ""
+    firsttime = True
+    while not ready:
+        client = boto3.client("ec2")
+        data = client.get_console_output(InstanceId=instanceid)
+        if "Output" not  in data:
+            if firsttime:
+                os.system("clear")
+                os.system("cat "+os.path.dirname(os.path.realpath(__file__))+"/waitforit")
+                firsttime = False
+        else:
+            current = data["Output"]
+            if not old:
+                print current
+                old = current
+            else:
+                if old != current:
+                    diff = re.sub(old, "", current)
+                    print diff
+            list_lines = current.split("\n")
+            for line in list_lines:
+                if re.match(".*loud-init.*finished.*", line):
+                    print "\n\n=========\nTime for SSH\n"
+                    ready = True
+        if ready:
+            break
+        else:
+            print "Sleeping 20seconds..."
+            time.sleep(20)
+    data = client.describe_instances(InstanceIds=[instanceid])["Reservations"][0]["Instances"][0]
+    if interface == "public":
+        ip = data["NetworkInterfaces"][0]["Association"]["PublicIp"]
+    else:
+        ip = data["PrivateIpAddress"]
+    os.system("ssh "+ip)
+
+def quickie():
+    """Quickly spawn an instance"""
+    #info = { "instance_type": { default = "t2.micro", all = [ "t2.micro" ] }, "image_id" : { default = "", all = [] }, "security_groups" : { default = [], all = [] }, "key_name": { default = "", all = [] }}
+    client = boto3.client("EC2")
+    data = client.describe_images()
+    info["image_id"]["all"]
+    args = {}
+    for attr in info:
+        print "Available values for "+attr+":\n"+" ".join(info[attr])
+        default = info[attr][0]
+        var = raw_input("Choose "+attr+"["+default+"]:")
+        if var == "":
+            var = default
+        if re.match("^.+\s", attr): 
+            args[attr] = [var]
+        else:
+            args[attr] = args
+    reservation = client.run_instances(**args)
+
+def update_sg_external_ip(sg="sg_external_ssh"):
+    """Add my Ip to be able to ssh"""
+    ip = os.popen("/usr/bin/curl ifconfig.co 2>/dev/null").readline().strip()
+    print "My Public IP is : "+ip
+    client = boto3.client("ec2")
+    ippermissions =  client.describe_security_groups(GroupNames = [ sg ])["SecurityGroups"][0]["IpPermissions"]
+    print "Revoking old IP from group "+sg
+    client.revoke_security_group_ingress(GroupName = sg, IpPermissions = ippermissions)
+    print "Adding new IP to group "+sg
+    client.authorize_security_group_ingress(GroupName=sg, IpProtocol="-1", FromPort=0, ToPort=0, CidrIp=ip+"/32")
+
+def main(list_args):
+    dict_method = {
+        "ec2":      "ec2list",
+        "set":      "set_profile",
+        "sgup":     "update_sg_external_ip",
+        "console":  "ec2console",
+        "ssh"       :                         "ssh"
+    }
+    arg = list_args.pop(0)
+    try:
+        funcname = dict_method[arg]
+    except:
+        print "Unknown action "+arg
+        sys.exit(1)
+    if list_args:
+        globals()[funcname](*list_args)
+    else:
+        globals()[funcname]()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

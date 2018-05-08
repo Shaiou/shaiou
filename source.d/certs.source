@@ -1,0 +1,28 @@
+export CAPATH="~/Certs"
+
+function gencert {
+    if [[ -z $CAPATH ]]
+    then
+        echo "CAPATH var not set"
+        return
+    fi
+    TYPE=$1
+    CN=$2
+    HOSTS=$3
+    HOSTOPT=""
+    case $TYPE in
+        ca)
+            echo $CONFGITEMPLATE > $CAPATH/ca-config.json
+            echo $CSRTEMPLATE | sed -e "s#__CN__#`hostname` Awesome CA#" > $CAPATH/ca-csr.json
+            PWD=$CAPATH cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+            ;;
+        client|server)
+            if [[ ! -z $HOSTS ]]
+            then
+                HOSTOPT="--hostname $HOSTS"
+            fi
+            echo $CSRTEMPLATE | sed -e "s#__CN__#$CN#" > $CN-csr.json
+            cfssl gencert -ca=$CAPATH/ca.pem -ca-key=$CAPATH/ca-key.pem -config=$CAPATH/ca-config.json -profile=default $HOSTOPT $CN-csr.json | cfssljson -bare $CN
+            ;;
+    esac
+}
