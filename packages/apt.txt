@@ -1,0 +1,4 @@
+clusterssh
+python-pip
+terminator
+tree

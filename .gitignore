@@ -1,4 +1,7 @@
-.*
-Certs/*
+.*/
+.bash_history
+certs/*
 env.d/*
+packages/go/*/
 source.d/local.source
+.viminfo

@@ -1,4 +1,7 @@
-export CAPATH="~/Certs"
+export CAPATH="~/certs"
+
+CONFGITEMPLATE='{"signing":{"default":{"expiry":"8760h"},"profiles":{"default":{"usages":["signing","keyencipherment","serverauth","clientauth"],"expiry":"8760h"}}}}'
+CSRTEMPLATE='{"CN":"__CN__","key":{"algo":"ecdsa","size":256},"names":[{"C":"FR","ST":"FR","L":"Paris"}]}'
 
 function gencert {
     if [[ -z $CAPATH ]]
