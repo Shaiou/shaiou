@@ -1,3 +1,6 @@
 awscli
-json
+boto3
+flask
 requests
+tabulate
+simplejson

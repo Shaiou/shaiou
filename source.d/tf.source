@@ -1,2 +1,2 @@
 alias tf='terraform'
-export PATH=$PATH:~/tfenv/bin
+export PATH=$PATH:~/modules/tfenv/bin
