@@ -39,13 +39,13 @@ function pset {
 }
 
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
-for i in $(find ~/env.d/ -name *source)
+for i in $(find ~/env.d/ -name "*.source")
 do
     export $(cat $i | xargs)
 done
 export EDITOR="vi"
 pset
-for i in  ~/source.d/*
+for i in $(find ~/source.d/ -name "*.source")
 do
     source $i
 done
