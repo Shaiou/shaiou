@@ -1,2 +1,15 @@
-alias tf='terraform'
+function tf {
+    if [[ $1 == "show" ]]
+    then
+        terraform $@
+        return $?
+    fi
+    VAROPTS=""
+    for file in $(find . -name '*tfvars')
+    do
+        VAROPTS="$VAROPTS -var-file $file"
+    done
+    terraform $@ $VAROPTS
+}
+
 export PATH=$PATH:~/modules/tfenv/bin
