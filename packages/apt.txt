@@ -5,6 +5,7 @@ cpu-checker
 curl
 docker.io
 htop
+jq
 keepassxc
 libgconf-2-4
 libudev-dev
@@ -17,3 +18,4 @@ spotify-client
 terminator
 tree
 virtinst
+xclip
