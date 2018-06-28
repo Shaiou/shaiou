@@ -14,9 +14,6 @@ function awset {
     export PREV_AWS_PROFILE=$AWS_PROFILE
     export AWS_DEFAULT_PROFILE=$1
     export AWS_PROFILE=$1
-    eval "$(ssh-agent -s)"
-    export PS1="${YELLOW}[\$AWS_PROFILE/\$AWS_REGION]$RESET ${CYAN}\u@\h:..."'${PWD#"${PWD%/*/*}/"}'"$RED\$(__git_ps1 '(%s)')$RESET#"
-    find /Workspace/Keys -name  "$1.*.pem" -exec ssh-add {} + || return
 }
 
 #You need to have a line with mfa_$profile with the serial of your mfa device

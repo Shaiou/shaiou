@@ -1,0 +1,10 @@
+function work {
+    export WORK=$1
+    if [[ -f ~/env.d/$WORK ]]
+    then
+        source ~/env.d/$WORK
+    fi
+    find /Workspace/Keys -name  "$WORK.*.pem" -exec ssh-add {} + 2>/dev/null || return
+ pset
+    cd /Workspace/$WORK
+}

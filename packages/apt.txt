@@ -4,6 +4,7 @@ clusterssh
 cpu-checker
 curl
 docker.io
+golang-cfssl
 htop
 jq
 keepassxc
