@@ -1,0 +1,3 @@
+#compdef work
+
+_arguments "1:Work Environment:(betterfly bnb partners privatelounge smaug)"
