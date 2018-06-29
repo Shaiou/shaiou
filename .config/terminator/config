@@ -1,4 +1,6 @@
 [global_config]
+  smart_copy = False
+  suppress_multiple_term_dialog = True
 [keybindings]
   broadcast_all = <Primary>Home
   broadcast_group = <Primary>Insert

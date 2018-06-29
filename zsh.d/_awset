@@ -1,4 +1,3 @@
 #compdef awset
 
-_arguments "1:Aws Profile:($(awk -F'[][]' '{ORS= " "} /\[/ {print $2}' $HOME/.aws/credentials))"
-~                        
+_arguments "1:Work Environment:($(awk -F'[][]' '{ORS= " "} /\[/ {print $2}' $HOME/.aws/credentials))"

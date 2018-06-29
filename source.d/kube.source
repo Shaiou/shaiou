@@ -1,0 +1,4 @@
+function kubeset {
+    export KUBENV=$1
+    export KUBECONFIG=~/kube.d/$KUBENV
+}
