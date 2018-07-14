@@ -1,6 +1,7 @@
 .*/
 certs/*
 env.d/*
+kube.d/*
 packages/go/*/
 source.d/local.source
 .bash_history
