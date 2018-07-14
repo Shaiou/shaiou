@@ -1,0 +1,2 @@
+alias xcopy="xclip -i -selection primary"
+alias xpaste="xclip -o -selection primary"
