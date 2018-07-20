@@ -1,2 +1,11 @@
-alias xcopy="xclip -i -selection primary"
-alias xpaste="xclip -o -selection primary"
+function xcopy {
+    FILE=$1
+    echo "Copying contents of $FILE to all clipboards"
+    xclip -i -selection primary $FILE
+    xclip -i -selection secondary $FILE
+}
+function xpaste {
+    FILE=$1
+    echo "Appending the following to $FILE file:"
+    xclip -o -selection primary | tee -a $FILE
+}

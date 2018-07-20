@@ -15,8 +15,11 @@ openssh-server
 openvpn
 python-pip
 qemu-kvm
+rubygems
 spotify-client
 terminator
 tree
+unzip
 virtinst
 xclip
+yamllint
