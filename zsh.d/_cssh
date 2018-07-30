@@ -1,0 +1,3 @@
+#compdef cssh
+
+_arguments "1:cssh cluster:($(awk '{OFS = " "} /^clusters =/ {for (i=3; i<=NF; i++) print $i}' ~/.clusterssh/config))"
