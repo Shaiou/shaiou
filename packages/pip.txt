@@ -1,6 +1,7 @@
 awscli
 boto3
 flask
+prettytable
 requests
 tabulate
 simplejson

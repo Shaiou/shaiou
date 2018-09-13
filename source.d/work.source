@@ -6,5 +6,5 @@ function work {
     fi
     find /Workspace/Keys -name  "$WORK.*.pem" -exec ssh-add {} + 2>/dev/null || return
  pset
-    [[ ! $PWD == /Workspace/$WORK/* ]] &&  cd /Workspace/$WORK
+    [[ ! $PWD == /Workspace/_$WORK/* ]] &&  cd /Workspace/_$WORK
 }

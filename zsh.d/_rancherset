@@ -1,0 +1,3 @@
+#compdef rancherset
+
+_arguments "1:rancher environment:($(find $HOME/rancher.d/ -type f -printf '%f '))"

@@ -11,6 +11,7 @@ keepassxc
 libgconf-2-4
 libudev-dev
 libvirt-bin
+nfs-common
 openssh-server
 openvpn
 python-pip

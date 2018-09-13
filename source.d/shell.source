@@ -3,6 +3,7 @@ function xcopy {
     echo "Copying contents of $FILE to all clipboards"
     xclip -i -selection clipboard $FILE
 }
+
 function xpaste {
     FILE=$1
     echo "Appending the following to $FILE file:"
