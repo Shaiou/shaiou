@@ -1,3 +1,4 @@
+ansible
 atom
 bridge-utils
 clusterssh
@@ -6,6 +7,7 @@ curl
 docker.io
 golang-cfssl
 htop
+iridium-browser
 jq
 keepassxc
 libgconf-2-4
@@ -22,5 +24,6 @@ terminator
 tree
 unzip
 virtinst
+wmctrl
 xclip
 yamllint

@@ -17,6 +17,22 @@ zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle :compinstall filename '/home/shaiou/.zshrc'
 autoload -Uz compinit
 compinit
+autoload -Uz add-zsh-hook
+get_cmd () {
+    COMMAND=$1
+}
+
+get_workspace () {
+    RETURN_CODE=$?
+    CURRENT_WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
+    if [ ! $WORKSPACE = $CURRENT_WORKSPACE ]
+    then
+        notify-send $WORKSPACE "command: $COMMAND\nreturn code: $RETURN_CODE"
+    fi
+    WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
+}
+add-zsh-hook preexec get_cmd
+add-zsh-hook precmd get_workspace
 
 for i in $(find ~/env.d/ -name "*.source")
 do
