@@ -1,14 +1,8 @@
-export CAPATH="$HOME/certs"
-
 CONFGITEMPLATE='{"signing":{"default":{"expiry":"8760h"},"profiles":{"default":{"usages":["signing","keyencipherment","serverauth","clientauth"],"expiry":"8760h"}}}}'
-CSRTEMPLATE='{"CN":"__CN__","key":{"algo":"ecdsa","size":256},"names":[{"C":"FR","ST":"FR","L":"Paris"}]}'
+CSRTEMPLATE='{"CN":"__CN__","key":{"algo":"rsa","size":2048},"names":[{"C":"FR","ST":"FR","L":"Paris"}]}'
 
 function gencert {
-    if [[ -z $CAPATH ]]
-    then
-        echo "CAPATH var not set"
-        return
-    fi
+    CAPATH=${CAPATH:-"."}
     TYPE=$1
     CN=$2
     HOSTS=$3
@@ -16,8 +10,10 @@ function gencert {
     case $TYPE in
         ca)
             echo $CONFGITEMPLATE > $CAPATH/ca-config.json
-            echo $CSRTEMPLATE | sed -e "s#__CN__#`hostname` Awesome CA#" > $CAPATH/ca-csr.json
+            echo $CSRTEMPLATE | sed -e "s#__CN__#${CN:-`hostname`} Awesome CA#" > $CAPATH/ca-csr.json
+            set -v
             PWD=$CAPATH cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+            set +v
             ;;
         client|server)
             if [[ ! -z $HOSTS ]]
@@ -25,7 +21,17 @@ function gencert {
                 HOSTOPT="--hostname $HOSTS"
             fi
             echo $CSRTEMPLATE | sed -e "s#__CN__#$CN#" > $CN-csr.json
+            set -v
             cfssl gencert -ca=$CAPATH/ca.pem -ca-key=$CAPATH/ca-key.pem -config=$CAPATH/ca-config.json -profile=default $HOSTOPT $CN-csr.json | cfssljson -bare $CN
+            set +v
             ;;
     esac
+}
+
+function checkcert {
+    openssl x509 -in $1 -noout -text |egrep -v ":[a-f0-9]{2}:$"
+}
+
+function checkcsr {
+    openssl req -in $1 -noout -text |egrep -v ":[a-f0-9]{2}:$"
 }

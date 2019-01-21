@@ -14,6 +14,8 @@ function awset {
     export PREV_AWS_PROFILE=$AWS_PROFILE
     export AWS_DEFAULT_PROFILE=$1
     export AWS_PROFILE=$1
+    ssh-add -D
+    noglob ssh-add /Workspace/Keys/${AWS_PROFILE}*pem 2>/dev/null
 }
 
 #You need to have a line with mfa_$profile with the serial of your mfa device
@@ -74,6 +76,9 @@ function ecrlogin {
     else
         $(aws ecr  get-login --no-include-email --registry-ids $1)
     fi
+    AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+    export REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
 }
 
 function stree {
