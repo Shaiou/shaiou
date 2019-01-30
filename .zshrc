@@ -47,3 +47,5 @@ done
 export EDITOR="vi"
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -lart'
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

@@ -17,6 +17,7 @@ nfs-common
 nmap
 openssh-server
 openvpn
+pass
 python-pip
 qemu-kvm
 rubygems

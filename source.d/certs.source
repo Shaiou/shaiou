@@ -1,4 +1,4 @@
-CONFGITEMPLATE='{"signing":{"default":{"expiry":"8760h"},"profiles":{"default":{"usages":["signing","keyencipherment","serverauth","clientauth"],"expiry":"8760h"}}}}'
+CONFGITEMPLATE='{"signing":{"default":{"expiry":"43800h"},"profiles":{"default":{"usages":["signing","keyencipherment","serverauth","clientauth"],"expiry":"8760h"}}}}'
 CSRTEMPLATE='{"CN":"__CN__","key":{"algo":"rsa","size":2048},"names":[{"C":"FR","ST":"FR","L":"Paris"}]}'
 
 function gencert {
