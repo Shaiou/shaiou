@@ -49,3 +49,5 @@ for i in $(find ~/source.d/ -name "*.source")
 do
     source $i
 done
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
