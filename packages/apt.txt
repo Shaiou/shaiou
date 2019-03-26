@@ -9,10 +9,12 @@ golang-cfssl
 htop
 iridium-browser
 jq
+kafkacat
 keepassxc
 libgconf-2-4
 libudev-dev
 libvirt-bin
+lynx
 nfs-common
 nmap
 openssh-server

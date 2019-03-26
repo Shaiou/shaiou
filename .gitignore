@@ -1,11 +1,7 @@
+# dot stuff
 .*/
 .*
 !.Config/
-certs/*
-env.d/*
-kube.d/*
-packages/go/*/
-source.d/local.source
 .bash_history
 .bash_logout
 .dmrc
@@ -18,3 +14,20 @@ source.d/local.source
 .xscreensaver
 .xsession-errors
 .zcompdump
+# .d stuff
+env.d
+kube.d
+rancher.d
+source.d/local.source
+# misc
+ansible-temp
+certs/*
+Desktop
+Documentation
+Downloads
+go/
+packages/go/*/
+Pictures
+snap
+Templates
+VirtualBox VMs/

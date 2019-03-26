@@ -9,3 +9,10 @@ function xpaste {
     echo "Appending the following to $FILE file:"
     xclip -o -selection clipboard | tee -a $FILE
 }
+
+function curlco {
+    URL=$1
+    HOST=$(echo $URL |awk -F'/' '{print $3}')
+    FAKE=$2
+    curl -vkL --connect-timeout 5 --connect-to $HOST:443:$FAKE:443 $URL "${@:3}"
+}
