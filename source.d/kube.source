@@ -2,3 +2,5 @@ function kubeset {
     export KUBENV=$1
     export KUBECONFIG=~/kube.d/$KUBENV
 }
+
+export PATH=$PATH:$HOME/.krew/bin

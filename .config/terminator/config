@@ -1,10 +1,11 @@
 [global_config]
-  focus = mouse
+  dbus = False
   suppress_multiple_term_dialog = True
 [keybindings]
   broadcast_all = <Primary>Home
   broadcast_group = <Primary>Insert
   broadcast_off = <Primary>End
+  close_term = <Primary><Shift>u
 [layouts]
   [[default]]
     [[[child1]]]
@@ -12,6 +13,218 @@
       type = Terminal
     [[[window0]]]
       parent = ""
+      type = Window
+  [[Test]]
+    [[[child0]]]
+      fullscreen = False
+      last_active_term = e72d73da-37e8-4d85-b055-70f2f123b837
+      last_active_window = True
+      maximised = False
+      order = 0
+      parent = ""
+      position = 960:25
+      size = 958, 1030
+      title = /usr/bin/zsh
+      type = Window
+    [[[child1]]]
+      order = 0
+      parent = child0
+      position = 253
+      ratio = 0.246829268293
+      type = VPaned
+    [[[child3]]]
+      order = 1
+      parent = child1
+      position = 253
+      ratio = 0.328145265888
+      type = VPaned
+    [[[child5]]]
+      order = 1
+      parent = child3
+      position = 253
+      ratio = 0.489361702128
+      type = VPaned
+    [[[terminal2]]]
+      group = Alpha
+      order = 0
+      parent = child1
+      profile = default
+      type = Terminal
+      uuid = e72d73da-37e8-4d85-b055-70f2f123b837
+    [[[terminal4]]]
+      group = Alpha
+      order = 0
+      parent = child3
+      profile = default
+      type = Terminal
+      uuid = 1ec23788-954c-4b2a-b071-16bfd51403fa
+    [[[terminal6]]]
+      group = Alpha
+      order = 0
+      parent = child5
+      profile = default
+      type = Terminal
+      uuid = dc3b47c8-e2e8-4ce9-8bae-f327de349155
+    [[[terminal7]]]
+      group = Alpha
+      order = 1
+      parent = child5
+      profile = default
+      type = Terminal
+      uuid = bd80bee0-e113-45b0-88c4-1f8976a01134
+  [[cssh_config_]]
+    [[[hpane00]]]
+      order = 0
+      parent = vpane0
+      position = 640
+      ratio = 0.333333333333
+      type = HPaned
+    [[[hpane01]]]
+      order = 1
+      parent = hpane00
+      position = 640
+      ratio = 0.5
+      type = HPaned
+    [[[hpane10]]]
+      order = 0
+      parent = vpane1
+      position = 640
+      ratio = 0.333333333333
+      type = HPaned
+    [[[hpane11]]]
+      order = 1
+      parent = hpane10
+      position = 640
+      ratio = 0.5
+      type = HPaned
+    [[[hpane20]]]
+      order = 1
+      parent = vpane1
+      position = 640
+      ratio = 0.333333333333
+      type = HPaned
+    [[[hpane21]]]
+      order = 1
+      parent = hpane20
+      position = 640
+      ratio = 0.5
+      type = HPaned
+    [[[term00]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane00
+      profile = default
+      type = Terminal
+    [[[term01]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane01
+      profile = default
+      type = Terminal
+    [[[term02]]]
+      command = /usr/bin/zsh
+      order = 1
+      parent = hpane01
+      profile = default
+      type = Terminal
+    [[[term10]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane10
+      profile = default
+      type = Terminal
+    [[[term11]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane11
+      profile = default
+      type = Terminal
+    [[[term12]]]
+      command = /usr/bin/zsh
+      order = 1
+      parent = hpane11
+      profile = default
+      type = Terminal
+    [[[term20]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane20
+      profile = default
+      type = Terminal
+    [[[term21]]]
+      command = /usr/bin/zsh
+      order = 0
+      parent = hpane21
+      profile = default
+      type = Terminal
+    [[[term22]]]
+      command = /usr/bin/zsh
+      order = 1
+      parent = hpane21
+      profile = default
+      type = Terminal
+    [[[vpane0]]]
+      order = 0
+      parent = window0
+      position = 360
+      ratio = 0.333333333333
+      type = VPaned
+    [[[vpane1]]]
+      order = 1
+      parent = vpane0
+      position = 360
+      ratio = 0.5
+      type = VPaned
+    [[[window0]]]
+      parent = ""
+      position = 0:0
+      type = Window
+  [[cssh_config_ha-stg-fr]]
+    [[[hpane00]]]
+      order = 0
+      parent = vpane0
+      position = 1920
+      ratio = 0.5
+      type = HPaned
+    [[[hpane10]]]
+      order = 1
+      parent = vpane0
+      position = 1920
+      ratio = 0.5
+      type = HPaned
+    [[[term00]]]
+      command = echo CSSHNATOR started &&echo BroadCast All default At+A &&echo connecting to @lbint-afde63b8.lb.core.vpgrp.io &&ssh @lbint-afde63b8.lb.core.vpgrp.io
+      order = 0
+      parent = hpane00
+      profile = default
+      type = Terminal
+    [[[term01]]]
+      command = echo CSSHNATOR started &&echo BroadCast All default At+A &&echo connecting to @lbint-741c4725.lb.core.vpgrp.io &&ssh @lbint-741c4725.lb.core.vpgrp.io
+      order = 1
+      parent = hpane00
+      profile = default
+      type = Terminal
+    [[[term10]]]
+      command = exit
+      order = 0
+      parent = hpane10
+      profile = default
+      type = Terminal
+    [[[term11]]]
+      command = exit
+      order = 1
+      parent = hpane10
+      profile = default
+      type = Terminal
+    [[[vpane0]]]
+      order = 0
+      parent = window0
+      position = 1080
+      ratio = 0.5
+      type = VPaned
+    [[[window0]]]
+      parent = ""
+      position = 0:0
       type = Window
 [plugins]
 [profiles]
