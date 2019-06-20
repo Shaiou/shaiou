@@ -1,13 +1,10 @@
 ansible
 atom
-bridge-utils
 clusterssh
-cpu-checker
 curl
 docker.io
 golang-cfssl
 htop
-iridium-browser
 jq
 kafkacat
 keepassxc
@@ -18,7 +15,6 @@ lynx
 nfs-common
 nmap
 openssh-server
-openvpn
 pass
 python-pip
 qemu-kvm
