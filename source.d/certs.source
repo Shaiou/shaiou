@@ -29,9 +29,9 @@ function gencert {
 }
 
 function checkcert {
-    openssl x509 -in $1 -noout -text |egrep -v ":[a-f0-9]{2}:$"
+    openssl x509 -in $1 -noout -text |egrep -v "^\s+([a-f0-9:]{2,3})+$"
 }
 
 function checkcsr {
-    openssl req -in $1 -noout -text |egrep -v ":[a-f0-9]{2}:$"
+    openssl req -in $1 -noout -text |egrep -v "^\s+([a-f0-9:]{2,3})+$"
 }
