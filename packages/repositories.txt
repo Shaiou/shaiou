@@ -1,2 +1,0 @@
-ppa:webupd8team/atom
-ppa:gophers/archive

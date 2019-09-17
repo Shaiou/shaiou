@@ -1,0 +1,15 @@
+atom
+docker
+htop
+jq
+go
+keepassxc
+lynx
+nmap
+pass
+python-pip
+spotify
+terminator
+wmctrl
+yamllint
+vim
