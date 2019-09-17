@@ -4,7 +4,7 @@ from os import getenv
 from os.path import abspath,isfile,realpath,join,dirname
 import boto3
 import flask
-import ConfigParser
+import configparser
 import json
 import urllib
 import requests
@@ -48,7 +48,7 @@ def login(profile):
 @app.route("/")
 def main():
     index = '<!DOCTYPE html><html lang="en"><body>'
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(join(getenv('HOME'),'.aws/credentials'))
     iconsize = "40"
     width = "160"

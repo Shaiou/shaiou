@@ -1,1 +1,2 @@
 github.com/cloudflare/cfssl/cmd/cfssl
+github.com/gopasspw/gopass@v1.8.4
