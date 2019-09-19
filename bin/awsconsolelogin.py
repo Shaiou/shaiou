@@ -36,7 +36,7 @@ def login(profile):
                                         creds['SessionToken'])
 
     url = 'https://signin.aws.amazon.com/federation\
-?Action=getSigninToken&Session='+urllib.quote_plus(jsoncreds)
+?Action=getSigninToken&Session='+urllib.parse.quote_plus(jsoncreds)
     r = requests.get(url)
     url='https://signin.aws.amazon.com/federation\
 ?Action=login\
