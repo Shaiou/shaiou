@@ -86,6 +86,3 @@ function stree {
     echo "===== $1 ( $region ) ======"
     aws s3 ls --recursive s3://$1/ --region $region
 }
-
-## Default
-setregion eu-west-1
