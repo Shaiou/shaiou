@@ -6,61 +6,82 @@ import re
 import simplejson as json
 import sys
 import time
+
+from pick import pick
+from prettytable import PrettyTable
 from tabulate import tabulate
 
 def print_table(rows, headers=""):
-   os.system("clear")
-   date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
-   print(date)
-   print(tabulate(rows, headers))
+    date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
+    print(date)
+    print(tabulate(rows, headers))
 
 def ec2(filter=".*",interval=0):
-   """ List EC2 instances in a table format"""
-   interval = int(interval)
-   def printlist():
-       (list_table,list_headers) = ec2list(filter=filter)
-       print_table(list_table, list_headers)
-   if interval:
-       while True:
-           printlist()
-           time.sleep(interval)
-   else:
-       printlist()
+    """ List EC2 instances in a table format"""
+    interval = int(interval)
+    def printlist():
+        (list_instances,list_headers) = ec2list(filter=filter)
+        x = PrettyTable()
+        x.field_names = list_headers
+        for instance in list_instances:
+            x.add_row([ instance[y] for y in list_headers ])
+        print(x)
+    if interval:
+        while True:
+            os.system("clear")
+            printlist()
+            time.sleep(interval)
+    else:
+        printlist()
 
 def ec2list(filter=".*"):
-   """ Get EC2 instances """
-   list_headers = [ "Name", "ID", "LaunchTime", "Private IP", "Public IP", "Type", "Ami", "State"]
-   client = boto3.client("ec2")
-   data = client.describe_instances()
-   list_instances = []
-   list_table = []
-   for reservation in data["Reservations"]:
-       list_instances.extend(reservation["Instances"])
-   for instance in list_instances:
-       list_instance = []
-       if "Tags" in instance:
-           for tag in instance["Tags"]:
-               if tag["Key"] == "Name":
-                   list_instance = [ tag["Value"] ]
-                   break
-       if not list_instance:
-           list_instance = [""]
-       list_instance.append(instance["InstanceId"])
-       list_instance.append(str(instance["LaunchTime"]))
-       try:
-           list_instance.append(instance["PrivateIpAddress"])
-       except:
-           list_instance.append("")
-       try:
-           list_instance.append(instance["NetworkInterfaces"][0]["Association"]["PublicIp"])
-       except:
-           list_instance.append("")
-       list_instance.append(instance["InstanceType"])
-       list_instance.append(instance["ImageId"])
-       list_instance.append(instance["State"]["Name"])
-       if re.match("^.*"+filter+".*$", " ".join(list_instance)):
-           list_table.append(list_instance)
-   return list_table,list_headers
+    """ Get EC2 instances """
+    client = boto3.client("ec2")
+    data = client.describe_instances()
+    list_selected_instances = []
+    list_all_instances = []
+    for reservation in data["Reservations"]:
+        list_all_instances.extend(reservation["Instances"])
+    list_headers = [
+        "name",
+        "privateip",
+        "launchtime",
+        "ami",
+        "state"
+    ]
+    for instance in list_all_instances:
+        if instance["State"]["Name"] == "terminated":
+            continue
+        dict_instance = {
+            "name": "",
+            "id": instance["InstanceId"],
+            "launchtime": str(instance["LaunchTime"]),
+            "privateip": "",
+            "ami" : instance["ImageId"],
+            "state" : instance["State"]["Name"],
+            
+        }
+        if "Tags" in instance:
+            for tag in instance["Tags"]:
+                if tag["Key"] == "Name":
+                    dict_instance["name"] = tag["Value"]
+                    break
+        try:
+            dict_instance["privateip"] = instance["PrivateIpAddress"]
+        except:
+            pass  
+        try:
+            dict_instance["publicip"] = instance["NetworkInterfaces"][0]["Association"]["PublicIp"]
+        except:
+            pass
+
+        for key in dict_instance:
+            if re.match("^.*"+filter+".*$", dict_instance[key]):
+                list_selected_instances.append(dict_instance)
+                break
+           
+    sorted_list = sorted(list_selected_instances, key=lambda d: (d['name'], d['launchtime']))
+    return sorted_list, list_headers
 
 def ec2console(instanceid, interface="public"):
    """ Query console output of new instance and ssh when ready"""
@@ -125,15 +146,31 @@ def quickie():
    reservation = client.run_instances(**args)
 
 def ssh(filter=".*"):
-   """ssh to all nodes matching the filter"""
-   list_table,list_headers = ec2list(filter=filter)
-   list_instances= [ x[0] for x in list_table ]
-   list_ips = [ x[3] for x in list_table ]
-   print('Found the following instances:')
-   print(list_instances)
-   print('Connecting to the following ips')
-   print(list_ips)
-   os.system('terminator -e \'tmux-cssh {}\''.format(' '.join(list_ips)))
+    """ssh to all nodes matching the filter"""
+    list_instances,list_headers = ec2list(filter=filter)
+    all_string = "## D: LA REPONSE D"
+    title = "Pick the instances to SSH into:"
+    options = [ '{} ---- {} ---- {}'.format(
+                    x["name"],
+                    x["privateip"],
+                    x["launchtime"],
+                    x["state"]) for x in list_instances ]
+    options.append(all_string)
+    
+    list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
+    del(options[:-1])
+    list_ips = []
+    if not list_selected:
+        print("No host selected, exiting")
+        return
+    else:
+        for option,index in list_selected:
+            if option == all_string:
+                list_ips = [ x['privateip'] for x in list_instances ]
+                break
+            else:
+                list_ips.append(list_instances[index]['privateip'])
+    os.system('tmux-cssh {}'.format(' '.join(list_ips)))
 
 def update_sg_external_ip(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
@@ -147,23 +184,23 @@ def update_sg_external_ip(sg="sg_external_ssh"):
    client.authorize_security_group_ingress(GroupName=sg, IpProtocol="-1", FromPort=0, ToPort=0, CidrIp=ip+"/32")
 
 def main(list_args):
-   dict_method = {
-       "ec2":      "ec2",
-       "set":      "set_profile",
-       "sgup":     "update_sg_external_ip",
-       "console":  "ec2console",
-       "ssh"       :                         "ssh"
-   }
-   arg = list_args.pop(0)
-   try:
-       funcname = dict_method[arg]
-   except:
-       print("Unknown action "+arg)
-       sys.exit(1)
-   if list_args:
-       globals()[funcname](*list_args)
-   else:
-       globals()[funcname]()
+    dict_method = {
+        "ec2"     : "ec2",
+        "set"     : "set_profile",
+        "sgup"    : "update_sg_external_ip",
+        "console" : "ec2console",
+        "ssh"     : "ssh"
+    }
+    arg = list_args.pop(0)
+    try:
+        funcname = dict_method[arg]
+    except:
+        print("Unknown action "+arg)
+        sys.exit(1)
+    if list_args:
+        globals()[funcname](*list_args)
+    else:
+        globals()[funcname]()
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])

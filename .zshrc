@@ -45,10 +45,11 @@ done
 
 #Aliases and exports
 export GOPATH=/Workspace/Go
-export PATH=$PATH:$GOPATH/bin
-export EDITOR="vi"
+export PATH=$PATH:~/bin:$GOPATH/bin
+export EDITOR="vim"
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -lart'
 alias vi='vim'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
