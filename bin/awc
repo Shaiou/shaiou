@@ -79,8 +79,9 @@ def ec2list(filter=".*"):
             if re.match("^.*"+filter+".*$", dict_instance[key]):
                 list_selected_instances.append(dict_instance)
                 break
-            
-    return list_selected_instances, list_headers
+           
+    sorted_list = sorted(list_selected_instances, key=lambda d: (d['name'], d['launchtime']))
+    return sorted_list, list_headers
 
 def ec2console(instanceid, interface="public"):
    """ Query console output of new instance and ssh when ready"""
@@ -147,15 +148,29 @@ def quickie():
 def ssh(filter=".*"):
     """ssh to all nodes matching the filter"""
     list_instances,list_headers = ec2list(filter=filter)
-
+    all_string = "## D: LA REPONSE D"
     title = "Pick the instances to SSH into:"
-    options = [ '{} {} {}'.format(
+    options = [ '{} ---- {} ---- {}'.format(
                     x["name"],
                     x["privateip"],
                     x["launchtime"],
-                    x["status"]) for x in list_instances ]
+                    x["state"]) for x in list_instances ]
+    options.append(all_string)
     
-    #os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+    list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
+    del(options[:-1])
+    list_ips = []
+    if not list_selected:
+        print("No host selected, exiting")
+        return
+    else:
+        for option,index in list_selected:
+            if option == all_string:
+                list_ips = [ x['privateip'] for x in list_instances ]
+                break
+            else:
+                list_ips.append(list_instances[index]['privateip'])
+    os.system('tmux-cssh {}'.format(' '.join(list_ips)))
 
 def update_sg_external_ip(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
