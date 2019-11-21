@@ -9,58 +9,64 @@ import time
 from tabulate import tabulate
 
 def print_table(rows, headers=""):
-   os.system("clear")
-   date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
-   print(date)
-   print(tabulate(rows, headers))
+    date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
+    print(date)
+    print(tabulate(rows, headers))
 
 def ec2(filter=".*",interval=0):
-   """ List EC2 instances in a table format"""
-   interval = int(interval)
-   def printlist():
-       (list_table,list_headers) = ec2list(filter=filter)
-       print_table(list_table, list_headers)
-   if interval:
-       while True:
-           printlist()
-           time.sleep(interval)
-   else:
-       printlist()
+    """ List EC2 instances in a table format"""
+    interval = int(interval)
+    def printlist():
+        (list_table,list_headers) = ec2list(filter=filter)
+        print_table(list_table, list_headers)
+    if interval:
+        while True:
+            os.system("clear")
+            printlist()
+            time.sleep(interval)
+    else:
+    printlist()
 
 def ec2list(filter=".*"):
-   """ Get EC2 instances """
-   list_headers = [ "Name", "ID", "LaunchTime", "Private IP", "Public IP", "Type", "Ami", "State"]
-   client = boto3.client("ec2")
-   data = client.describe_instances()
-   list_instances = []
-   list_table = []
-   for reservation in data["Reservations"]:
-       list_instances.extend(reservation["Instances"])
-   for instance in list_instances:
-       list_instance = []
-       if "Tags" in instance:
-           for tag in instance["Tags"]:
-               if tag["Key"] == "Name":
-                   list_instance = [ tag["Value"] ]
-                   break
-       if not list_instance:
-           list_instance = [""]
-       list_instance.append(instance["InstanceId"])
-       list_instance.append(str(instance["LaunchTime"]))
-       try:
-           list_instance.append(instance["PrivateIpAddress"])
-       except:
-           list_instance.append("")
-       try:
-           list_instance.append(instance["NetworkInterfaces"][0]["Association"]["PublicIp"])
-       except:
-           list_instance.append("")
-       list_instance.append(instance["InstanceType"])
-       list_instance.append(instance["ImageId"])
-       list_instance.append(instance["State"]["Name"])
-       if re.match("^.*"+filter+".*$", " ".join(list_instance)):
-           list_table.append(list_instance)
-   return list_table,list_headers
+    """ Get EC2 instances """
+    client = boto3.client("ec2")
+    data = client.describe_instances()
+    list_instances = []
+    list_all_instances = []
+    for reservation in data["Reservations"]:
+        data.extend(reservation["Instances"])
+    for instance in list_all_instances:
+        if instance["State"]["Name"] == "terminated":
+            continue
+        dict_instance = {
+            "name": "",
+            "id": instance["InstanceId"],
+            "launchtime": str(instance["LaunchTime"]),
+            "privateip": "",
+            "publicip" : "",
+            "state" : "",
+            
+        }
+        if "Tags" in instance:
+            for tag in instance["Tags"]:
+                if tag["Key"] == "Name":
+                    dict_instance["Name"] = [ tag["Value"] ]
+                    break
+        try:
+            dict_instance["privateip"] = instance["PrivateIpAddress"]
+        except:
+            pass  
+        try:
+            dict_instance["publicip"] = instance["NetworkInterfaces"][0]["Association"]["PublicIp"]
+        except:
+            pass
+        dict_instance["id"] = instance["ImageId"]
+        dict_instance["state"] = instance["State"]["Name"]
+
+        for key in dict_instance:
+            if re.match("^.*"+filter+".*$", dict_instance[key])
+                list_instances.append
+    return list_table,list_headers
 
 def ec2console(instanceid, interface="public"):
    """ Query console output of new instance and ssh when ready"""
@@ -133,7 +139,7 @@ def ssh(filter=".*"):
    print(list_instances)
    print('Connecting to the following ips')
    print(list_ips)
-   os.system('terminator -e \'tmux-cssh {}\''.format(' '.join(list_ips)))
+   os.system('tmux-cssh {}'.format(' '.join(list_ips)))
 
 def update_sg_external_ip(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
