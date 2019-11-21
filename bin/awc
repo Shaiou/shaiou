@@ -6,8 +6,10 @@ import re
 import simplejson as json
 import sys
 import time
-from tabulate import tabulate
+
+from pick import pick
 from prettytable import PrettyTable
+from tabulate import tabulate
 
 def print_table(rows, headers=""):
     date = os.popen("date +'%d-%m-%y %H:%M:%S'").readline()
@@ -20,10 +22,8 @@ def ec2(filter=".*",interval=0):
     def printlist():
         (list_instances,list_headers) = ec2list(filter=filter)
         x = PrettyTable()
-        x.fieldnames = list_headers
+        x.field_names = list_headers
         for instance in list_instances:
-            print(instance)
-            print(list_headers)
             x.add_row([ instance[y] for y in list_headers ])
         print(x)
     if interval:
@@ -64,7 +64,7 @@ def ec2list(filter=".*"):
         if "Tags" in instance:
             for tag in instance["Tags"]:
                 if tag["Key"] == "Name":
-                    dict_instance["name"] = [ tag["Value"] ]
+                    dict_instance["name"] = tag["Value"]
                     break
         try:
             dict_instance["privateip"] = instance["PrivateIpAddress"]
@@ -77,7 +77,9 @@ def ec2list(filter=".*"):
 
         for key in dict_instance:
             if re.match("^.*"+filter+".*$", dict_instance[key]):
-                list_seltected_instances.append(dict_instance)
+                list_selected_instances.append(dict_instance)
+                break
+            
     return list_selected_instances, list_headers
 
 def ec2console(instanceid, interface="public"):
@@ -143,15 +145,17 @@ def quickie():
    reservation = client.run_instances(**args)
 
 def ssh(filter=".*"):
-   """ssh to all nodes matching the filter"""
-   list_table,list_headers = ec2list(filter=filter)
-   list_instances= [ x[0] for x in list_table ]
-   list_ips = [ x[3] for x in list_table ]
-   print('Found the following instances:')
-   print(list_instances)
-   print('Connecting to the following ips')
-   print(list_ips)
-   os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+    """ssh to all nodes matching the filter"""
+    list_instances,list_headers = ec2list(filter=filter)
+
+    title = "Pick the instances to SSH into:"
+    options = [ '{} {} {}'.format(
+                    x["name"],
+                    x["privateip"],
+                    x["launchtime"],
+                    x["status"]) for x in list_instances ]
+    
+    #os.system('tmux-cssh {}'.format(' '.join(list_ips)))
 
 def update_sg_external_ip(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
@@ -165,23 +169,23 @@ def update_sg_external_ip(sg="sg_external_ssh"):
    client.authorize_security_group_ingress(GroupName=sg, IpProtocol="-1", FromPort=0, ToPort=0, CidrIp=ip+"/32")
 
 def main(list_args):
-   dict_method = {
-       "ec2":      "ec2",
-       "set":      "set_profile",
-       "sgup":     "update_sg_external_ip",
-       "console":  "ec2console",
-       "ssh"       :                         "ssh"
-   }
-   arg = list_args.pop(0)
-   try:
-       funcname = dict_method[arg]
-   except:
-       print("Unknown action "+arg)
-       sys.exit(1)
-   if list_args:
-       globals()[funcname](*list_args)
-   else:
-       globals()[funcname]()
+    dict_method = {
+        "ec2"     : "ec2",
+        "set"     : "set_profile",
+        "sgup"    : "update_sg_external_ip",
+        "console" : "ec2console",
+        "ssh"     : "ssh"
+    }
+    arg = list_args.pop(0)
+    try:
+        funcname = dict_method[arg]
+    except:
+        print("Unknown action "+arg)
+        sys.exit(1)
+    if list_args:
+        globals()[funcname](*list_args)
+    else:
+        globals()[funcname]()
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])
