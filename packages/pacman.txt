@@ -2,12 +2,15 @@ atom
 docker
 htop
 jq
+fasd
+fzf
 go
 keepassxc
 lynx
 nmap
 pass
 python-pip
+ruby
 spotify
 terminator
 wmctrl
