@@ -51,5 +51,6 @@ alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -lart'
 alias vi='vim'
 
+eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
+pipenv shell
