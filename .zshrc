@@ -53,4 +53,3 @@ alias vi='vim'
 
 eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-pipenv shell

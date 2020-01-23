@@ -148,6 +148,9 @@ def quickie():
 def ssh(filter=".*"):
     """ssh to all nodes matching the filter"""
     list_instances,list_headers = ec2list(filter=filter)
+    if not list_instances:
+        print("No instance matched the filter")
+        sys.exit(1)
     all_string = "## D: LA REPONSE D"
     title = "Pick the instances to SSH into:"
     options = [ '{} ---- {} ---- {}'.format(
@@ -170,7 +173,10 @@ def ssh(filter=".*"):
                 break
             else:
                 list_ips.append(list_instances[index]['privateip'])
-    os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+    if len(list_ips) == 1:
+        os.system('ssh {}'.format(list_ips[0]))
+    else:
+        os.system('tmux-cssh {}'.format(' '.join(list_ips)))
 
 def update_sg_external_ip(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""

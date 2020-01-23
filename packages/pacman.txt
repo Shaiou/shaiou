@@ -1,6 +1,9 @@
 arandr
 atom
+bridge-utils
+dnsmasq
 docker
+ebtables
 fasd
 fzf
 go
@@ -12,8 +15,10 @@ libmpdclient
 lynx
 net-tools
 nmap
+openbsd-netcat
 pass
 python-pip
+qemu
 rofi
 ruby
 spotify
@@ -21,7 +26,9 @@ tcpdump
 terminator
 traceroute
 transmission-qt
+vde2
 vim
+virt-manager
 vlc
 wmctrl
 yamllint
