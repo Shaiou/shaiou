@@ -62,10 +62,9 @@ def ec2list(filter=".*"):
             
         }
         if "Tags" in instance:
+            dict_instance['branch'] = ''
             for tag in instance["Tags"]:
-                if tag["Key"] == "Name":
-                    dict_instance["name"] = tag["Value"]
-                    break
+                dict_instance[tag["Key"].lower()] = tag["Value"]
         try:
             dict_instance["privateip"] = instance["PrivateIpAddress"]
         except:
@@ -153,9 +152,10 @@ def ssh(filter=".*"):
         sys.exit(1)
     all_string = "## D: LA REPONSE D"
     title = "Pick the instances to SSH into:"
-    options = [ '{} ---- {} ---- {}'.format(
+    options = [ '{} ---- {} ---- {} ---- {}'.format(
                     x["name"],
                     x["privateip"],
+                    x["branch"],
                     x["launchtime"],
                     x["state"]) for x in list_instances ]
     options.append(all_string)
