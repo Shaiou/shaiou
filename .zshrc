@@ -22,17 +22,22 @@ get_cmd () {
     COMMAND=$1
 }
 
-get_workspace () {
+notify_workspace () {
     RETURN_CODE=$?
     CURRENT_WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
     if [ ! $WORKSPACE = $CURRENT_WORKSPACE ]
     then
-        notify-send $WORKSPACE "command: $COMMAND\nreturn code: $RETURN_CODE"
+        EXECUTABLE=$(echo $COMMAND | awk '{print $1}')
+        if [ -f ~/Icons/${EXECUTABLE}.png ];then
+            notify-send -i ~/Icons/${EXECUTABLE}.png "Workspace: $WORKSPACE" "command:=$EXECUTABLE $COMMAND\nreturn code: $RETURN_CODE"
+        else
+            notify-send "Workspace: $WORKSPACE" "command:=$COMMAND\nreturn code: $RETURN_CODE"
+        fi
     fi
     WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
 }
 add-zsh-hook preexec get_cmd
-add-zsh-hook precmd get_workspace
+add-zsh-hook precmd notify_workspace
 
 for i in $(find ~/env.d/ -name "*.source")
 do
@@ -43,9 +48,13 @@ do
     source $i
 done
 
+#key layout
+setxkbmap fr
+alias fr="setxkbmap fr"
+alias us="setxkbmap us"
 #Aliases and exports
 export GOPATH=/Workspace/Go
-export PATH=$PATH:~/bin:$GOPATH/bin
+export PATH=~/bin:$GOPATH/bin:$PATH
 export EDITOR="vim"
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -lart'

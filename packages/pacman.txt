@@ -17,6 +17,8 @@ net-tools
 nmap
 openbsd-netcat
 pass
+pavucontrol
+pasystray
 python-pip
 qemu
 rofi
@@ -24,6 +26,7 @@ ruby
 spotify
 tcpdump
 terminator
+the_silver_searcher
 traceroute
 transmission-qt
 vde2
