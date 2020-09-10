@@ -59,7 +59,7 @@ def ec2list(filter=".*"):
             "privateip": "",
             "ami" : instance["ImageId"],
             "state" : instance["State"]["Name"],
-            
+
         }
         if "Tags" in instance:
             dict_instance['branch'] = ''
@@ -68,7 +68,7 @@ def ec2list(filter=".*"):
         try:
             dict_instance["privateip"] = instance["PrivateIpAddress"]
         except:
-            pass  
+            pass
         try:
             dict_instance["publicip"] = instance["NetworkInterfaces"][0]["Association"]["PublicIp"]
         except:
@@ -78,7 +78,7 @@ def ec2list(filter=".*"):
             if re.match("^.*"+filter+".*$", dict_instance[key]):
                 list_selected_instances.append(dict_instance)
                 break
-           
+
     sorted_list = sorted(list_selected_instances, key=lambda d: (d['name'], d['launchtime']))
     return sorted_list, list_headers
 
@@ -144,7 +144,7 @@ def quickie():
            args[attr] = args
    reservation = client.run_instances(**args)
 
-def ssh(filter=".*"):
+def ssh(filter=".*",user=""):
     """ssh to all nodes matching the filter"""
     list_instances,list_headers = ec2list(filter=filter)
     if not list_instances:
@@ -159,26 +159,57 @@ def ssh(filter=".*"):
                     x["launchtime"],
                     x["state"]) for x in list_instances ]
     options.append(all_string)
-    
+
     list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
     del(options[:-1])
     list_ips = []
     if not list_selected:
         print("No host selected, exiting")
         return
-    else:
-        for option,index in list_selected:
-            if option == all_string:
-                list_ips = [ x['privateip'] for x in list_instances ]
-                break
-            else:
-                list_ips.append(list_instances[index]['privateip'])
+    for option,index in list_selected:
+        if option == all_string:
+            list_ips = [ x['privateip'] for x in list_instances ]
+            break
+        else:
+            list_ips.append(list_instances[index]['privateip'])
     if len(list_ips) == 1:
-        os.system('ssh {}'.format(list_ips[0]))
+        if not user:
+            os.system('ssh {}'.format(list_ips[0]))
+        else:
+            os.system('ssh {}@{}'.format(user,list_ips[0]))
     else:
-        os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+        if not user:
+            os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+        else:
+            os.system('tmux-cssh -o "-l {}" {}'.format(user,' '.join(list_ips)))
 
-def update_sg_external_ip(sg="sg_external_ssh"):
+def terminate(filter=".*"):
+    """terminate nodes matching the filter"""
+    list_instances,list_headers = ec2list(filter=filter)
+    if not list_instances:
+        print("No instance matched the filter")
+        sys.exit(1)
+    title = "Pick the instances to terminate"
+    options = [ '{} ---- {} ---- {} ---- {}'.format(
+                    x["name"],
+                    x["privateip"],
+                    x["id"],
+                    x["launchtime"],
+                    x["state"]) for x in list_instances ]
+
+    list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
+    del(options[:-1])
+    list_ips = []
+    if not list_selected:
+        print("No host selected, exiting")
+        return
+    list_ids = []
+    for option,index in list_selected:
+        list_ids.append(list_instances[index]['id'])
+    print("Terminating instances {}".format(list_ids))
+    boto3.client("ec2").terminate_instances(InstanceIds=list_ids)
+
+def sgup(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
    ip = os.popen("/usr/bin/curl ifconfig.co 2>/dev/null").readline().strip()
    print("My Public IP is : "+ip)
@@ -190,23 +221,11 @@ def update_sg_external_ip(sg="sg_external_ssh"):
    client.authorize_security_group_ingress(GroupName=sg, IpProtocol="-1", FromPort=0, ToPort=0, CidrIp=ip+"/32")
 
 def main(list_args):
-    dict_method = {
-        "ec2"     : "ec2",
-        "set"     : "set_profile",
-        "sgup"    : "update_sg_external_ip",
-        "console" : "ec2console",
-        "ssh"     : "ssh"
-    }
     arg = list_args.pop(0)
-    try:
-        funcname = dict_method[arg]
-    except:
-        print("Unknown action "+arg)
-        sys.exit(1)
     if list_args:
-        globals()[funcname](*list_args)
+        globals()[arg](*list_args)
     else:
-        globals()[funcname]()
+        globals()[arg]()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

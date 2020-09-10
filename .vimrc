@@ -1,9 +1,11 @@
+set nu
 set tabstop=4
 set expandtab
 set softtabstop=4
 set shiftwidth=4
 set hlsearch
 set shell=/bin/bash
+set clipboard=unnamedplus
 syntax on
 filetype plugin on
 au BufNewFile,BufRead *.tf* set filetype=tf

@@ -2,6 +2,9 @@ HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
 
+# Load ssh agent
+eval $(ssh-agent -s)
+
 #Prompt
 setopt promptsubst
 autoload -U colors && colors

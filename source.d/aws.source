@@ -14,7 +14,6 @@ function awset {
     export PREV_AWS_PROFILE=$AWS_PROFILE
     export AWS_DEFAULT_PROFILE=$1
     export AWS_PROFILE=$1
-    ssh-add -D
     noglob ssh-add /Workspace/Keys/${AWS_PROFILE}*pem 2>/dev/null
 }
 
