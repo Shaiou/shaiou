@@ -1,6 +1,8 @@
+alias k=kubectl
+
 function kubeset {
     export KUBENV=$1
-    export KUBECONFIG=~/kube.d/$KUBENV
+    export KUBECONFIG=~/.kube/$KUBENV
 }
 
 export PATH=$PATH:$HOME/.krew/bin

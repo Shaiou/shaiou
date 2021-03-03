@@ -77,7 +77,6 @@ function ecrlogin {
     fi
     AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
     export REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-
 }
 
 function stree {

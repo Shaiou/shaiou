@@ -1,0 +1,3 @@
+alias gpp="git pull --prune --tags"
+alias gc="git checkout"
+alias gforce="git commit --amend --no-edit; git push -f"
