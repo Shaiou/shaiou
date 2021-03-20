@@ -16,7 +16,7 @@ ecdsa==0.13.3
 flask==1.1.1
 idna==2.8
 itsdangerous==1.1.0
-jinja2==2.10.1
+jinja2==2.11.3
 jmespath==0.9.4
 markupsafe==1.1.1
 paramiko==2.6.0
