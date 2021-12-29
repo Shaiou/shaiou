@@ -57,11 +57,13 @@ alias fr="setxkbmap fr"
 alias us="setxkbmap us"
 #Aliases and exports
 export GOPATH=/Workspace/Go
-export PATH=~/bin:$GOPATH/bin:$PATH
+export PATH=~/bin:~/.screenlayout:$GOPATH/bin:$PATH:/opt/conduktor-2.18.1/bin/
 export EDITOR="vim"
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
-alias ll='ls -lart'
+alias ll='ls -larth'
 alias vi='vim'
+alias diff='diff -u --color'
 
 eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export XDG_RUNTIME_DIR=/run/user/$(id -u)

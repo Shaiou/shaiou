@@ -81,6 +81,7 @@ function ecrlogin {
 
 function stree {
     region=$(aws s3api get-bucket-location --bucket $1 --output text --query 'LocationConstraint')
+    if [ $region = "None" ]; then export region=us-east-1; fi
     echo "===== $1 ( $region ) ======"
     aws s3 ls --recursive s3://$1/ --region $region
 }

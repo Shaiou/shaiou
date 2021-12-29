@@ -1,1 +1,2 @@
+export VIRTUAL_ENV_DISABLE_PROMPT=true
 source /home/shaiou/virtualenv/python3.9/bin/activate

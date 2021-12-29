@@ -1,6 +1,7 @@
 # dot stuff
 .*/
 .*
+*.png
 !.Config/
 .bash_history
 .bash_logout
@@ -17,7 +18,6 @@
 # .d stuff
 env.d
 kube.d
-rancher.d
 source.d/local.source
 # misc
 ansible-temp
