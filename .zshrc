@@ -6,10 +6,12 @@ SAVEHIST=1000
 eval $(ssh-agent -s)
 
 #Prompt
+#$'\U2388'
+KUBE_PS1=$'\u2638\ufe0f'
 setopt promptsubst
 autoload -U colors && colors
 function pset {
-    export PS1='%B%{$fg[white]%}[${AWS_PROFILE}/${AWS_REGION}]%{$fg[yellow]%}%n@%m %{$fg[cyan]%}%d%{$fg[red]%}($(git branch 2>/dev/null|awk  "/*/ {print $2}"))%{$reset_color%}
+    export PS1='%B%{$fg[blue]%}${KUBE_PS1} $(echo ${KUBECONFIG##*/})%{$fg[white]%}[${AWS_PROFILE##*-}/${AWS_REGION}]%{$fg[yellow]%}%n%{$fg[cyan]%}%d%{$fg[red]%}($(git branch 2>/dev/null|awk  "/*/ {print $2}"))%{$reset_color%}
 ${(r:$COLUMNS::_:)}'
 }
 pset
@@ -63,7 +65,9 @@ alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -larth'
 alias vi='vim'
 alias diff='diff -u --color'
+alias grep='grep --color=always'
 
 eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
