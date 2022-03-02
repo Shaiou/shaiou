@@ -160,7 +160,7 @@ def ssh(filter=".*",user=""):
                     x["state"]) for x in list_instances ]
     options.append(all_string)
 
-    list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
+    list_selected = pick(options, title, multiselect=True, default_index=len(options)-1)
     del(options[:-1])
     list_ips = []
     if not list_selected:
@@ -197,7 +197,7 @@ def terminate(filter=".*"):
                     x["launchtime"],
                     x["state"]) for x in list_instances ]
 
-    list_selected = pick(options, title, multi_select=True, default_index=len(options)-1)
+    list_selected = pick(options, title, multiselect=True, default_index=len(options)-1)
     del(options[:-1])
     list_ips = []
     if not list_selected:
