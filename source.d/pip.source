@@ -1,2 +1,0 @@
-export VIRTUAL_ENV_DISABLE_PROMPT=true
-source /home/shaiou/virtualenv/default/bin/activate

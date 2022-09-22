@@ -209,6 +209,16 @@ def terminate(filter=".*"):
     print("Terminating instances {}".format(list_ids))
     boto3.client("ec2").terminate_instances(InstanceIds=list_ids)
 
+def s3purge(bucket):
+    """Purge all files/version in a bucket"""
+    answer = input(f"Are you sure you want to purge bucket {bucket} [Y/N]?")
+    if answer != "Y":
+        print("Aborting")
+        return
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(bucket)
+    bucket.object_versions.all().delete()
+
 def sgup(sg="sg_external_ssh"):
    """Add my Ip to be able to ssh"""
    ip = os.popen("/usr/bin/curl ifconfig.co 2>/dev/null").readline().strip()

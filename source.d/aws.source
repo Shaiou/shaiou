@@ -69,14 +69,9 @@ function setregion {
 }
 
 function ecrlogin {
-    if [ $# -eq 0 ]
-    then
-        $(aws ecr  get-login --no-include-email)
-    else
-        $(aws ecr  get-login --no-include-email --registry-ids $1)
-    fi
     AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    export REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    aws ecr  get-login-password  | docker login --username AWS --password-stdin $REGISTRY
 }
 
 function stree {

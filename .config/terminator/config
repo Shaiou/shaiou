@@ -1,21 +1,43 @@
 [global_config]
   dbus = False
   suppress_multiple_term_dialog = True
+  always_split_with_profile = True
 [keybindings]
-  broadcast_all = <Primary><Shift>Home
-  broadcast_group = <Primary><Shift>Insert
+  close_term = None
+  close_window = None
   broadcast_off = <Primary><Shift>End
-[layouts]
-  [[default]]
-    [[[child1]]]
-      parent = window0
-      type = Terminal
-    [[[window0]]]
-      parent = ""
-      type = Window
-[plugins]
+  broadcast_group = <Primary><Shift>Insert
+  broadcast_all = <Primary><Shift>Home
 [profiles]
   [[default]]
-    copy_on_selection = True
     cursor_color = "#aaaaaa"
     scrollback_infinite = True
+    copy_on_selection = True
+  [[Normal]]
+    cursor_color = "#aaaaaa"
+    scrollback_infinite = True
+  [[Terrasse]]
+    background_color = "#ffffff"
+    cursor_color = "#aaaaaa"
+    foreground_color = "#000000"
+    scrollback_infinite = True
+[layouts]
+  [[default]]
+    [[[child0]]]
+      fullscreen = False
+      last_active_term = 9bdc87b1-f1cf-4610-9694-067df917d279
+      last_active_window = True
+      maximised = False
+      order = 0
+      parent = ""
+      position = 0:18
+      size = 956, 1025
+      title = /bin/zsh
+      type = Window
+    [[[terminal1]]]
+      order = 0
+      parent = child0
+      profile = default
+      type = Terminal
+      uuid = 9bdc87b1-f1cf-4610-9694-067df917d279
+[plugins]
