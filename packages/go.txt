@@ -1,2 +1,2 @@
-github.com/cloudflare/cfssl/cmd/cfssl
+github.com/cloudflare/cfssl/cmd/cfssl@latest
 github.com/gopasspw/gopass@v1.8.4

@@ -1,2 +1,8 @@
+google-chrome
+pyenv-virtualenv
+signal-desktop
+slack-desktop
 siji-git
+tfenv
+tgenv
 ttf-unifont

@@ -9,5 +9,5 @@ pip install -r pip.txt
 
 for gorepo in $(cat go.txt)
 do
-    go get -u $gopkg
+    go install $gopkg
 done

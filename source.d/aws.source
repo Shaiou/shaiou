@@ -1,3 +1,4 @@
+export aws_sdk_load_config=1
 function creds {
     aws sts get-caller-identity
 }

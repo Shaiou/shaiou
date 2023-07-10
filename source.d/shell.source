@@ -20,3 +20,8 @@ function curlco {
 function sshadd {
     ssh-add /Workspace/Keys/$1
 }
+
+function title()
+{
+   echo -en "\e]2;$1\a"
+}

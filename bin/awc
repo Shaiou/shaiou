@@ -47,6 +47,7 @@ def ec2list(filter=".*"):
         "privateip",
         "launchtime",
         "ami",
+        "size",
         "state"
     ]
     for instance in list_all_instances:
@@ -55,6 +56,7 @@ def ec2list(filter=".*"):
         dict_instance = {
             "name": "",
             "id": instance["InstanceId"],
+            "size": instance["InstanceType"],
             "launchtime": str(instance["LaunchTime"]),
             "privateip": "",
             "ami" : instance["ImageId"],
@@ -179,9 +181,9 @@ def ssh(filter=".*",user=""):
             os.system('ssh {}@{}'.format(user,list_ips[0]))
     else:
         if not user:
-            os.system('tmux-cssh {}'.format(' '.join(list_ips)))
+            os.system('tssh {}'.format(' '.join(list_ips)))
         else:
-            os.system('tmux-cssh -o "-l {}" {}'.format(user,' '.join(list_ips)))
+            os.system('tssh -o "-l {}" {}'.format(user,' '.join(list_ips)))
 
 def terminate(filter=".*"):
     """terminate nodes matching the filter"""

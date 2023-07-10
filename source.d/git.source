@@ -1,5 +1,6 @@
-alias gpp="git tag -d stable ;git pull --prune --tags"
+alias gpp="git tag -d stable;git tag -d latest; git pull --prune --tags"
 alias gc="git checkout"
 alias gforce="git commit --amend --no-edit; git push -f"
 alias gd="git diff --word-diff"
 alias merge="lab mr create -s -d origin master -a shailendra.narayen"
+alias mergerelease="lab mr create -s -d origin release -a shailendra.narayen"
