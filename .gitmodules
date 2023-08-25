@@ -4,3 +4,6 @@
 [submodule "modules/jinja2-lint"]
 	path = modules/jinja2-lint
 	url = git@github.com:drm/jinja2-lint.git
+[submodule "modules/asdf"]
+	path = modules/asdf
+	url = https://github.com/asdf-vm/asdf.git
