@@ -18,6 +18,10 @@ function awset {
     noglob ssh-add /Workspace/Keys/${AWS_PROFILE}*pem 2>/dev/null
 }
 
+function aws-id {
+    aws sts get-caller-identity
+}
+
 #You need to have a line with mfa_$profile with the serial of your mfa device
 function mfa {
     PROFILE=$1

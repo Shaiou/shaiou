@@ -16,6 +16,9 @@ def print_table(rows, headers=""):
     print(date)
     print(tabulate(rows, headers))
 
+#################################################################################################
+# EC2 SECTION
+#################################################################################################
 def ec2(filter=".*",interval=0):
     """ List EC2 instances in a table format"""
     interval = int(interval)
@@ -45,6 +48,7 @@ def ec2list(filter=".*"):
     list_headers = [
         "name",
         "privateip",
+        "id",
         "launchtime",
         "ami",
         "size",
@@ -54,7 +58,7 @@ def ec2list(filter=".*"):
         if instance["State"]["Name"] == "terminated":
             continue
         dict_instance = {
-            "name": "",
+            "name": "missing-name-tag",
             "id": instance["InstanceId"],
             "size": instance["InstanceType"],
             "launchtime": str(instance["LaunchTime"]),
@@ -127,53 +131,37 @@ def ec2console(instanceid, interface="public"):
        ip = data["PrivateIpAddress"]
    os.system("ssh "+ip)
 
-def quickie():
-   """Quickly spawn an instance"""
-   #info = { "instance_type": { default = "t2.micro", all = [ "t2.micro" ] }, "image_id" : { default = "", all = [] }, "security_groups" : { default = [], all = [] }, "key_name": { default = "", all = [] }}
-   client = boto3.client("EC2")
-   data = client.describe_images()
-   info["image_id"]["all"]
-   args = {}
-   for attr in info:
-       print("Available values for "+attr+":\n"+" ".join(info[attr]))
-       default = info[attr][0]
-       var = raw_input("Choose "+attr+"["+default+"]:")
-       if var == "":
-           var = default
-       if re.match("^.+\s", attr):
-           args[attr] = [var]
-       else:
-           args[attr] = args
-   reservation = client.run_instances(**args)
-
-def ssh(filter=".*",user=""):
-    """ssh to all nodes matching the filter"""
+def pick_instances(title,filter="*",response_field= "id",multiselect=False):
+    """ Function to select instances """
     list_instances,list_headers = ec2list(filter=filter)
     if not list_instances:
         print("No instance matched the filter")
         sys.exit(1)
-    all_string = "## D: LA REPONSE D"
-    title = "Pick the instances to SSH into:"
-    options = [ '{} ---- {} ---- {} ---- {}'.format(
-                    x["name"],
-                    x["privateip"],
-                    x["branch"],
-                    x["launchtime"],
-                    x["state"]) for x in list_instances ]
-    options.append(all_string)
-
-    list_selected = pick(options, title, multiselect=True, default_index=len(options)-1)
-    del(options[:-1])
-    list_ips = []
-    if not list_selected:
+    options = []
+    fields=[ "name","id", "privateip", "launchtime", "state", "ami" ]
+    for instance in list_instances:
+        options.append(" -- ".join([ instance[field] for field in fields]))
+    all_string = "ALL of the above"
+    if multiselect:
+        options.append(all_string)
+    selection = pick(options, title, multiselect=multiselect)
+    if not selection:
         print("No host selected, exiting")
-        return
-    for option,index in list_selected:
-        if option == all_string:
-            list_ips = [ x['privateip'] for x in list_instances ]
-            break
-        else:
-            list_ips.append(list_instances[index]['privateip'])
+        system.exit(1)
+    elif multiselect:
+        response = []
+        for option,index in selection:
+            if option == all_string:
+                response = [ x[response_field] for x in list_instances ]
+                break
+            response.append(list_instances[index][response_field])
+        return response
+    option,index = selection
+    return list_instances[index][response_field]
+
+def ssh(filter=".*",user=""):
+    """ssh to all nodes matching the filter"""
+    list_ips = pick_instances("Pick instance(s) to SSH into", filter, response_field="privateip", multiselect=True)
     if len(list_ips) == 1:
         if not user:
             os.system('ssh {}'.format(list_ips[0]))
@@ -185,32 +173,38 @@ def ssh(filter=".*",user=""):
         else:
             os.system('tssh -o "-l {}" {}'.format(user,' '.join(list_ips)))
 
+
+def ssm(filter="*", remoteport=0, localport=0):
+    """ Function to ssm into instance, adding 2 extraargs switches to port forwarding """
+    instance_id = pick_instances("Pick an instance to SSM into", filter)
+    message = "Pick an instance to SSM into"
+    kwargs = {
+        "Target": instance_id
+    }
+    if remoteport and localport:
+        message = "Pick and instance to SSM port forward"
+        kwargs = {
+            "DocumentName" : "AWS-StartPortForwardingSession",
+            "Parameters" : {
+                "portNumber" : [remoteport],
+                "localPortNumber" : [localport]
+            },
+            "Target" : instance_id
+        }
+    if remoteport and localport:
+        os.system('aws ssm start-session --document-name AWS-StartPortForwardingSession --parameters portNumber={},localPortNumber={} --target {}'.format(remoteport,localport,instance_id))
+    else:
+        os.system('aws ssm start-session --target {}'.format(instance_id))
+
 def terminate(filter=".*"):
     """terminate nodes matching the filter"""
-    list_instances,list_headers = ec2list(filter=filter)
-    if not list_instances:
-        print("No instance matched the filter")
-        sys.exit(1)
-    title = "Pick the instances to terminate"
-    options = [ '{} ---- {} ---- {} ---- {}'.format(
-                    x["name"],
-                    x["privateip"],
-                    x["id"],
-                    x["launchtime"],
-                    x["state"]) for x in list_instances ]
-
-    list_selected = pick(options, title, multiselect=True, default_index=len(options)-1)
-    del(options[:-1])
-    list_ips = []
-    if not list_selected:
-        print("No host selected, exiting")
-        return
-    list_ids = []
-    for option,index in list_selected:
-        list_ids.append(list_instances[index]['id'])
+    list_ids = pick_instances("Pick instance(s) to terminate", filter)
     print("Terminating instances {}".format(list_ids))
     boto3.client("ec2").terminate_instances(InstanceIds=list_ids)
 
+#################################################################################################
+# S3 SECTION
+#################################################################################################
 def s3purge(bucket):
     """Purge all files/version in a bucket"""
     answer = input(f"Are you sure you want to purge bucket {bucket} [Y/N]?")
@@ -221,17 +215,6 @@ def s3purge(bucket):
     bucket = s3.Bucket(bucket)
     bucket.object_versions.all().delete()
 
-def sgup(sg="sg_external_ssh"):
-   """Add my Ip to be able to ssh"""
-   ip = os.popen("/usr/bin/curl ifconfig.co 2>/dev/null").readline().strip()
-   print("My Public IP is : "+ip)
-   client = boto3.client("ec2")
-   ippermissions =  client.describe_security_groups(GroupNames = [ sg ])["SecurityGroups"][0]["IpPermissions"]
-   print("Revoking old IP from group "+sg)
-   client.revoke_security_group_ingress(GroupName = sg, IpPermissions = ippermissions)
-   printr("Adding new IP to group "+sg)
-   client.authorize_security_group_ingress(GroupName=sg, IpProtocol="-1", FromPort=0, ToPort=0, CidrIp=ip+"/32")
-
 def main(list_args):
     arg = list_args.pop(0)
     if list_args:
@@ -239,5 +222,55 @@ def main(list_args):
     else:
         globals()[arg]()
 
+#################################################################################################
+# TAGS SECTION
+#################################################################################################
+def getag_dict(tags):
+    # TODO : handle pagination
+    client = boto3.client('resourcegroupstaggingapi')
+    tagfilters=[]
+    for i in tags.split(","):
+        tagfilters.append({
+            'Key': i.split("=")[0],
+            'Values': [ i.split("=")[1] ]
+        })
+    response = client.get_resources(TagFilters=tagfilters)["ResourceTagMappingList"]
+    resources = {}
+    for i in response:
+        arn = i["ResourceARN"]
+        name = "NO Name Tag"
+        for tag in i["Tags"]:
+            if tag["Key"] == "Name":
+                name = tag["Value"]
+                break
+        resources[arn] = name
+    return resources
+
+def getag(tags):
+    resources = getag_dict(tags)
+    for i in sorted(resources.keys()):
+        print("{} -- {}".format(i,resources[i]))
+
+def retag(tagsrc,tagdst):
+    resources = getag_dict(tagsrc)
+    for i in sorted(resources.keys()):
+        print("{} -- {}".format(i,resources[i]))
+    print("====== The preceding will be tagged with these new tags {} ======".format(tagdst))
+    answer = input("Confirm (y/n) ?")
+    if answer != "y":
+        print("Action cancelled per user request")
+        sys.exit(1)
+    client = boto3.client('resourcegroupstaggingapi')
+    tags = {}
+    for i in tagdst.split(","):
+        tags[i.split("=")[0]] = i.split("=")[1]
+    client.tag_resources(
+        ResourceARNList = list(resources.keys()),
+        Tags = tags
+    )
+
+#################################################################################################
+# MAIN SECTION
+#################################################################################################
 if __name__ == "__main__":
     main(sys.argv[1:])

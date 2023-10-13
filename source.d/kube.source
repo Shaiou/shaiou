@@ -5,4 +5,16 @@ function kubeset {
     export KUBECONFIG=~/.kube/$KUBENV
 }
 
+function runpod {
+    NAMESPACE=$1
+    IMAGE=$2
+    USER=$3
+    if [ -z $USER ]; then
+        USEROPT="--user $USER"
+    else
+        USEROPT=""
+    fi
+    kubectl -n $NAMESPACE run manual-run-pod --image=$IMAGE -i --tty
+}
+
 export PATH=$PATH:$HOME/.krew/bin
