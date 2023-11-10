@@ -72,8 +72,8 @@ export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
 #asdf
-export PATH=$PATH:~/.asdf/bin
-. ~/modules/asdf/asdf.sh
+export PATH=$PATH:/opt/asdf-vm/bin
+. /opt/asdf-vm/asdf.sh
 ## append completions to fpath
 fpath=(${ASDF_DIR}/completions $fpath)
 ## initialise completions with ZSH's compinit

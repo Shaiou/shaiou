@@ -65,17 +65,6 @@ git config --global user.email "shailendra.narayen@believe.com"
 git config --global user.name  "Shailendra Narayen"
 #https://github.com/zaquestion/lab/releases
 
-for plugin in python terraform terragrunt
-do
-  asdf plugin-add $plugin
-  asdf install $plugin latest
-  asdf global $plugin latest
-done
-## gitlab cli
-wget https://github.com/zaquestion/lab/releases/download/v0.25.1/lab_0.25.1_linux_amd64.tar.gz
-tar -zxvf lab_0.25.1_linux_amd64.tar.gz
-sudo mv lab /usr/local/bin
-
 # misc
 warp-cli teams-enroll believe-intranet
 warp-cli connect

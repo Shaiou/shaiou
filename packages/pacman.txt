@@ -1,6 +1,4 @@
 arandr
-asdf-vm
-atom
 bridge-utils
 difftastic
 dnsmasq

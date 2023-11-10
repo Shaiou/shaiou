@@ -1,0 +1,8 @@
+helm
+helm-diff
+k9s
+kubectl
+python
+terraform
+terraform-docs
+terragrunt
