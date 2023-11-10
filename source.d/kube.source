@@ -5,16 +5,10 @@ function kubeset {
     export KUBECONFIG=~/.kube/$KUBENV
 }
 
-function runpod {
-    NAMESPACE=$1
-    IMAGE=$2
-    USER=$3
-    if [ -z $USER ]; then
-        USEROPT="--user $USER"
-    else
-        USEROPT=""
-    fi
-    kubectl -n $NAMESPACE run manual-run-pod --image=$IMAGE -i --tty
+function rootpod {
+    NAMESPACE=${1:-default}
+    IMAGE=${2:-busybox}
+    kubectl -n $NAMESPACE run manual-run-pod --image=$IMAGE --overrides='{"spec": {"template": {"spec": {"containers": [{"securityContext": {"privileged": true} , "volumeMounts": [{"mountPath":"/host","name":"host-root"}]}]}, "volumes": [{"hostPath":{"path":"/","type":""},"name":"host-root"}]}}}' -i --tty --restart=Never --rm -- sh
 }
 
 export PATH=$PATH:$HOME/.krew/bin

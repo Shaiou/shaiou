@@ -1,9 +1,0 @@
-[submodule "modules/tfenv"]
-	path = modules/tfenv
-	url = https://github.com/kamatama41/tfenv.git
-[submodule "modules/jinja2-lint"]
-	path = modules/jinja2-lint
-	url = git@github.com:drm/jinja2-lint.git
-[submodule "modules/asdf"]
-	path = modules/asdf
-	url = https://github.com/asdf-vm/asdf.git

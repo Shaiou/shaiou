@@ -36,6 +36,7 @@ terminator
 the_silver_searcher
 traceroute
 transmission-qt
+usbutils
 vde2
 vim
 virt-manager

@@ -59,7 +59,6 @@ alias fr="setxkbmap fr"
 alias us="setxkbmap us"
 #Aliases and exports
 export GOPATH=/Workspace/Go
-export PATH=$PATH:~/bin:~/.screenlayout:$GOPATH/bin
 export EDITOR="vim"
 alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
 alias ll='ls -larth'
@@ -73,8 +72,9 @@ export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
 #asdf
+export PATH=$PATH:~/.asdf/bin
+. ~/modules/asdf/asdf.sh
 ## append completions to fpath
 fpath=(${ASDF_DIR}/completions $fpath)
 ## initialise completions with ZSH's compinit
 autoload -Uz compinit && compinit
-export PATH=$PATH:~/.asdf/bin
