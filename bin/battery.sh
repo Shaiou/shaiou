@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BAT=$(acpi -b | grep "Battery 0" | grep -E -o '[0-9][0-9]?%')
+BAT=$(acpi -b | grep -v "rate information unavailable" |grep  "Battery" | grep -E -o '1*[0-9][0-9]?%')
 
 # Full and short texts
 echo "Battery: $BAT"

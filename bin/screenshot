@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+/usr/bin/maim -s ~/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S)
