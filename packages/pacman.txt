@@ -1,4 +1,6 @@
 arandr
+atom
+bat
 bridge-utils
 difftastic
 dnsmasq
@@ -33,6 +35,7 @@ terminator
 the_silver_searcher
 traceroute
 transmission-qt
+ultralist
 usbutils
 vde2
 vim
