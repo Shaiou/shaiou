@@ -18,8 +18,8 @@
 # .d stuff
 env.d
 kube.d
-source.d/local.source
 # misc
+Android/
 ansible-temp
 certs/*
 Desktop
@@ -28,6 +28,9 @@ Downloads
 go/
 packages/go/*/
 Pictures
+Screenshots/
 snap
+SoftMaker/
 Templates
 VirtualBox VMs/
+Videos/
