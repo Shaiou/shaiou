@@ -1,80 +1,99 @@
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
-# Load ssh agent
-eval $(ssh-agent -s)
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
 
-#Prompt
-#$'\U2388'
-KUBE_PS1=$'\u2638\ufe0f'
-setopt promptsubst
-autoload -U colors && colors
-function pset {
-    export PS1='%B%{$fg[blue]%}${KUBE_PS1} $(echo ${KUBECONFIG##*/})%{$fg[white]%}[${AWS_PROFILE}/${AWS_REGION}]%{$fg[yellow]%}%n%{$fg[cyan]%}%d%{$fg[red]%}($(git branch 2>/dev/null|awk -F" " "/*/ {print $2}"))%{$reset_color%}
-${(r:$COLUMNS::_:)}'
-}
-pset
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="robbyrussell"
 
-#Zsh stuff
-fpath=(~/zsh.d $fpath)
-zstyle ':completion:*' completer _complete _ignored _approximate
-zstyle :compinstall filename '/home/shaiou/.zshrc'
-autoload -Uz compinit
-compinit
-autoload -Uz add-zsh-hook
-get_cmd () {
-    COMMAND=$1
-}
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
 
-notify_workspace () {
-    RETURN_CODE=$?
-    CURRENT_WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
-    if [ ! $WORKSPACE = $CURRENT_WORKSPACE ]
-    then
-        EXECUTABLE=$(echo $COMMAND | awk '{print $1}')
-        if [ -f ~/Icons/${EXECUTABLE}.png ];then
-            notify-send -i ~/Icons/${EXECUTABLE}.png "Workspace: $WORKSPACE" "command:=$EXECUTABLE $COMMAND\nreturn code: $RETURN_CODE"
-        else
-            notify-send "Workspace: $WORKSPACE" "command:=$COMMAND\nreturn code: $RETURN_CODE"
-        fi
-    fi
-    WORKSPACE=$(wmctrl -d |awk '/*/ {print $NF}')
-}
-add-zsh-hook preexec get_cmd
-add-zsh-hook precmd notify_workspace
+# Uncomment the following line to use hyphen-insensitive completion.
+HYPHEN_INSENSITIVE="true"
 
-for i in $(find ~/env.d/ -name "*.source")
-do
-    source $i
-done
-for i in $(find ~/source.d/ -name "*.source")
-do
-    source $i
-done
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+ zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
-#key layout
-setxkbmap fr
-alias fr="setxkbmap fr"
-alias us="setxkbmap us"
-#Aliases and exports
-export GOPATH=/Workspace/Go
-export EDITOR="vim"
-alias myip="/usr/bin/curl ifconfig.co 2>/dev/null"
-alias ll='ls -larth'
-alias vi='vim'
-alias diff='difft'
-alias grep='grep --color=always'
+# Uncomment the following line to change how often to auto-update (in days).
+zstyle ':omz:update' frequency 13
 
-eval "$(direnv hook zsh)"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
 
-#asdf
-export PATH=$PATH:/opt/asdf-vm/bin
-. /opt/asdf-vm/asdf.sh
-## append completions to fpath
-fpath=(${ASDF_DIR}/completions $fpath)
-## initialise completions with ZSH's compinit
-autoload -Uz compinit && compinit
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+ZSH_CUSTOM=~/zsh.custom
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+#

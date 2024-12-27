@@ -28,7 +28,7 @@ function gencert {
             fi
             echo $CSRTEMPLATE | sed -e "s#__CN__#$CN#" > $CN-csr.json
             set -v
-            cfssl gencert -ca=$CAPATH/intermediate.pem -ca-key=$CAPATH/intermediate-key.pem -config=$CAPATH/cfssl-config.json -profile=default $HOSTOPT $CN-csr.json | cfssljson -bare $CN
+            cfssl gencert -ca=$CAPATH/ca.pem -ca-key=$CAPATH/ca-key.pem -config=$CAPATH/cfssl-config.json -profile=default $HOSTOPT $CN-csr.json | cfssljson -bare $CN
             set +v
             ;;
     esac

@@ -17,10 +17,6 @@ function curlco {
     curl -vL --connect-timeout 5 --connect-to $HOST:443:$FAKE:443 $URL "${@:3}"
 }
 
-function sshadd {
-    ssh-add /Workspace/Keys/$1
-}
-
 function title()
 {
    echo -en "\e]2;$1\a"

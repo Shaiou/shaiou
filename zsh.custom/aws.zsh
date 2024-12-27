@@ -1,7 +1,4 @@
 export aws_sdk_load_config=1
-function creds {
-    aws sts get-caller-identity
-}
 
 function clearaws {
     unset AWS_PROFILE
@@ -41,33 +38,6 @@ function mfa {
     awset ${PROFILE}-mfa
 }
 
-function unassume {
-    awset $PREV_AWS_PROFILE
-}
-
-function assume {
-    PROFILE=$1
-    aws sts get-caller-identity --profile $PROFILE > /dev/null 2>&1 && echo "Creds are still valid" && awset $PROFILE && return
-    echo "Credentials expired, renewing token"
-    ACCOUNT=$(awk '$1=="'$1'" {print $2}' ~/.aws/assume.conf)
-    DEFAULTROLE=$(awk '$1=="'$1'" {print $3}' ~/.aws/assume.conf)
-    ROLE=$2
-    ROLE=${ROLE:-$DEFAULTROLE}
-    ARN=arn:aws:iam::${ACCOUNT}:role/$ROLE
-    TEMP=$(aws sts assume-role --role-arn $ARN --role-session-name $PROFILE --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text) || return
-
-    AWS_ACCESS_KEY_ID=$(echo $TEMP |awk '{print $1}')
-    AWS_SECRET_ACCESS_KEY=$(echo $TEMP |awk '{print $2}')
-    AWS_SESSION_TOKEN=$(echo $TEMP |awk '{print $3}')
-    export AWS_PROFILE_NAME="$PROFILE-$ROLE"
-
-    aws configure set profile.$PROFILE.aws_access_key_id $AWS_ACCESS_KEY_ID
-    aws configure set profile.$PROFILE.aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    aws configure set profile.$PROFILE.aws_session_token $AWS_SESSION_TOKEN
-
-    awset $PROFILE
-}
-
 function setregion {
     export AWS_REGION=$1
     export AWS_DEFAULT_REGION=$1
@@ -84,4 +54,12 @@ function stree {
     if [ $region = "None" ]; then export region=us-east-1; fi
     echo "===== $1 ( $region ) ======"
     aws s3 ls --recursive s3://$1/ --region $region
+}
+
+function awsall {
+    for profile in $(aws configure list-profiles)
+    do
+        echo "===== $profile ======"
+        aws --profile $profile $@
+    done
 }
