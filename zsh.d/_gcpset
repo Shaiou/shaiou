@@ -1,0 +1,3 @@
+#compdef gcpset
+
+_arguments "1:google cloud project:($(gcloud projects list |awk '/blv-/ {print $1}'))"
