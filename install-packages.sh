@@ -19,10 +19,3 @@ for gorepo in $(cat packages/go.txt)
 do
     go install $gopkg
 done
-
-for asdfplugin in $(cat packages/asdf.txt)
-do
-    asdf plugin-add $asdfplugin
-    asdf install $asdfplugin latest
-    asdf global $asdfplugin latest
-done

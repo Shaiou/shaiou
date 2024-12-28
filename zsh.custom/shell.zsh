@@ -4,6 +4,7 @@ unsetopt share_history
 setxkbmap fr
 
 # PATH
+export EDITOR="vim"
 export GOPATH=/Workspace/Go
 export PATH=$PATH:$GOPATH/bin
 
