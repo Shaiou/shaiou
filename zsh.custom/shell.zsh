@@ -30,16 +30,14 @@ done
 # Mise autocomplete
 eval "$(/home/shailendra/bin/mise activate zsh)"
 
+# Prompt
+export ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Plugins
+plugins=(argocd aws azure direnv docker docker-compose jira kubectl mise terraform)
 # Autocomplete stuff
 fpath=(~/zsh.d $fpath)
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle :compinstall filename '/home/shaiou/.zshrc'
 autoload -Uz compinit
 compinit
-autoload -Uz add-zsh-hook
-get_cmd () {
-    COMMAND=$1
-}
-
-# Prompt
-export ZSH_THEME="powerlevel10k/powerlevel10k"

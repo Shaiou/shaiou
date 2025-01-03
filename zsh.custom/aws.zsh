@@ -16,7 +16,7 @@ function awset {
 }
 
 function aws-id {
-    aws sts get-caller-identity
+    AWS_PAGER="" aws sts get-caller-identity
 }
 
 #You need to have a line with mfa_$profile with the serial of your mfa device
