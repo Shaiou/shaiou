@@ -15,3 +15,5 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 ./install-packages.sh
 sudo usermod -aG docker $USER
 xdg-settings set default-web-browser google-chrome.desktop
+
+git clone --depth 1 https://github.com/AstroNvim/template ~/.config/nvim

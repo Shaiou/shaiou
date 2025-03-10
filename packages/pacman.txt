@@ -19,6 +19,7 @@ libmpdclient
 make
 meld
 net-tools
+neovim
 nmap
 openbsd-netcat
 pass
